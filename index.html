@@ -1,0 +1,91 @@
+<!doctype html>
+
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Word Density</title>
+<link rel="stylesheet" type="text/css" href="css/global.css" />
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-78205-5', 'auto');
+ga('send', 'pageview');
+</script>
+</head>
+
+<body>
+
+<header>
+<h1>Word Density Tool</h1>
+<p>How many words are in your blob of text?</p>
+</header>
+
+<main>
+<div class="inline">
+<h2>Input</h2>
+<textarea id="input"></textarea>
+</div>
+<div class="inline">
+<h2>Output</h2>
+<textarea id="output"></textarea>
+<div><a href="#" download="output.tsv" href="#" id="download">Download TSV</a></div>
+</div>
+</main>
+
+<div style="max-width: 400px;margin: 0 auto;text-align: center;">
+<p><small>All calculations and tsv generation are done in your local browser, no data is sent to the web server. You can even download this page to your computer and use it locally if you'd like.</small></p>
+</div>
+
+<script>
+var in_obj = document.getElementById('input');
+var out_obj = document.getElementById('output');
+var download_obj = document.getElementById('download');
+
+in_obj.addEventListener('input', function(e) {
+	var input = in_obj.value.replace(/[^\w\s-]/gi, '').toLowerCase();
+	var input = input.split(/\s+/);
+	var words = [];
+	out_obj.value = '';
+	
+	input.forEach(function(w) {
+		var wk = -1;
+		for(var i = 0; i < words.length; i++) {
+			if(words[i][0] === w) {
+				wk = i;
+			}
+		}
+		
+		if(wk >= 0) {
+			words[wk][1]++;
+		} else if(w.length > 0) {
+			words.push([w,1]);
+		}
+	});
+	
+	words.sort(function(a,b) {
+		if(b[1] == a[1]) {
+			return a[0].localeCompare(b[0]);
+		} else {
+			return b[1] - a[1];
+		}
+	});
+	
+	words.forEach(function(w) {
+		out_obj.value = out_obj.value + w[0] +"\t"+ w[1] +"\n";
+	});
+	
+	var file = 'data:text/tsv,' + encodeURIComponent(out_obj.value);
+	download_obj.setAttribute('href',file);
+	
+	return false;
+});
+</script>
+
+</body>
+
+</html>
